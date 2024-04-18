@@ -7,6 +7,7 @@ import {
   Menu,
   Play,
   Plus,
+  Square,
 } from "lucide-react"
 import { NavLink, useLocation, Outlet } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
@@ -30,11 +31,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useSelector, useDispatch } from 'react-redux'
+import { start, increment, stop } from "@/slices/timerSlice"
+
+import { useEffect } from "react"
+import { TimerReducer } from "@/types"
+import { formatSecondsToTime } from "@/lib/utils"
 
 export default function AppLayout() {
 
   const location = useLocation();
   const { pathname } = location;
+
+  const dispatch = useDispatch();
+  const { isRunning, value } = useSelector((state: TimerReducer) => {
+    return state.timer
+  });
+
+  const handleStart = () => {
+    dispatch(start());
+  };
+
+  const handleStop = () => {
+    dispatch(stop());
+  };
+
+  useEffect(() => {
+    if (isRunning) {
+      const intervalId = setInterval(() => {
+        dispatch(increment());
+      }, 1000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [isRunning, dispatch]);
 
 
   return (
@@ -146,10 +176,14 @@ export default function AppLayout() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <input className="outline-none text-center border-none bg-transparent focus:outline-none focus:border-none" type="text" value="00:00:00" />
-            <Button variant="outline" className="rounded-full">
-              <Play className="h-4 w-4" />
-            </Button>
+            <p>{formatSecondsToTime(value)}</p>
+            {isRunning ? (            <Button type="button" onClick={handleStop} variant="outline" className="rounded-full">
+              <Square className="h-4 w-4" />
+            </Button>) : (
+                          <Button type="button" onClick={handleStart} variant="outline" className="rounded-full">
+                          <Play className="h-4 w-4" />
+                        </Button>
+            )}
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
