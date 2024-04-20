@@ -34,6 +34,7 @@ export const timerSlice = createSlice({
       state.value += 1
     },
     start: (state) => {
+      if(state.isRunning === true) return
       state.isRunning = true;
       window.localStorage.setItem('timer', JSON.stringify({startMoment: new Date()}))
     },

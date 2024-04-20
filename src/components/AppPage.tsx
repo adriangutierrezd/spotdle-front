@@ -1,7 +1,19 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import { getTasks } from "@/services/tasksService"
+import { useEffect, useState } from "react"
 
 export default function AppHome() {
+
+  const [tasks, setTasks] = useState<any[]>([])
+
+  useEffect(() => {
+    const tasksData = getTasks()
+    const { data } = tasksData
+
+    setTasks(data)
+  }, [])
+
+
   return (
     <Tabs defaultValue="week">
       <div className="flex justify-end">
