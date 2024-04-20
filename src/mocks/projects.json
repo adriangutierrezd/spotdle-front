@@ -1,0 +1,28 @@
+{
+    "projects": [
+        {
+            "name": "Salud",
+            "color": "#FFA533",
+            "userId": 1,
+            "id": 1
+        },
+        {
+            "name": "Car",
+            "color": "#33FF42",
+            "userId": 1,
+            "id": 2
+        },
+        {
+            "name": "Supplies",
+            "color": "#9033FF",
+            "userId": 1,
+            "id": 4
+        },
+        {
+            "name": "Car",
+            "color": "#33FF42",
+            "userId": 2,
+            "id": 3
+        }
+  ]
+}

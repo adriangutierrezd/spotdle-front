@@ -1,0 +1,34 @@
+{
+    "tasks": [
+        {
+            "name": "Entrenamiento",
+            "userId": 1,
+            "id": 1,
+            "projectId": 1,
+            "active": true,
+            "startedAt": "2024-04-20 13:00:00",
+            "endedAt": null,
+            "project": {
+                "name": "Salud",
+                "color": "#FFA533",
+                "userId": 1,
+                "id": 1
+            } 
+        },
+        {
+            "name": "Caminata",
+            "userId": 1,
+            "id": 2,
+            "projectId": 1,
+            "active": false,
+            "startedAt": "2024-04-20 10:00:00",
+            "endedAt": "2024-04-20 10:30:00",
+            "project": {
+                "name": "Salud",
+                "color": "#FFA533",
+                "userId": 1,
+                "id": 1
+            } 
+        }
+  ]
+}

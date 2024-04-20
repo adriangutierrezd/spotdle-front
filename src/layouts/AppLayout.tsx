@@ -21,27 +21,59 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useSelector, useDispatch } from 'react-redux'
 import { start, increment, stop } from "@/slices/timerSlice"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { TimerReducer } from "@/types"
-import { formatSecondsToTime } from "@/lib/utils"
+import { formatSecondsToTime, cn } from "@/lib/utils"
+import { getProjects } from "@/services/projectsService"
+import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Command as NativeCommand } from "cmdk"
+
 
 export default function AppLayout() {
 
   const location = useLocation();
   const { pathname } = location;
+
+  const [open, setOpen] = useState(false)
+  const [projectValue, setProjectValue] = useState("")
+
+  const frameworks = [
+    {
+      value: "next.js",
+      label: "Next.js",
+    },
+    {
+      value: "sveltekit",
+      label: "SvelteKit",
+    },
+    {
+      value: "nuxt.js",
+      label: "Nuxt.js",
+    },
+    {
+      value: "remix",
+      label: "Remix",
+    },
+    {
+      value: "astro",
+      label: "Astro",
+    },
+  ]
 
   const dispatch = useDispatch();
   const { isRunning, value } = useSelector((state: TimerReducer) => {
@@ -49,10 +81,20 @@ export default function AppLayout() {
   });
 
   const handleStart = () => {
+    // TODO
+    /**
+     *  Aquí deberíamos hacer una llamada al backend para crear la tarea en así junto con su fecha de inicio para 
+     *  poder hacer un tracking correcto del tiempo
+     * 
+     */
     dispatch(start());
   };
 
   const handleStop = () => {
+    // TODO
+    /**
+     *  Debemos mandar una llamada al backend para 2 actualizar la tarea y dejar constancia del momento de finalización
+     */
     dispatch(stop());
   };
 
@@ -161,28 +203,58 @@ export default function AppLayout() {
                 />
               </div>
             </form>
-            <Select>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Selecciona un proyecto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Fruits</SelectLabel>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="banana">Banana</SelectItem>
-                  <SelectItem value="blueberry">Blueberry</SelectItem>
-                  <SelectItem value="grapes">Grapes</SelectItem>
-                  <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-[200px] justify-between"
+                >
+                  {value
+                    ? frameworks.find((framework) => framework.value === projectValue)?.label
+                    : "Select framework..."}
+                  <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search framework..." className="h-9" />
+                  <CommandEmpty>No framework found.</CommandEmpty>
+                  <CommandGroup>
+                    <NativeCommand.List>
+
+                      {frameworks.map((framework) => (
+                        <CommandItem
+                          key={framework.value}
+                          value={framework.value}
+                          onSelect={(currentValue) => {
+                            setProjectValue(currentValue === projectValue ? "" : currentValue)
+                            setOpen(false)
+                          }}
+                        >
+                          {framework.label}
+                          <CheckIcon
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              projectValue === framework.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </NativeCommand.List>
+
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <p>{formatSecondsToTime(value)}</p>
-            {isRunning ? (            <Button type="button" onClick={handleStop} variant="outline" className="rounded-full">
+            {isRunning ? (<Button type="button" onClick={handleStop} variant="outline" className="rounded-full">
               <Square className="h-4 w-4" />
             </Button>) : (
-                          <Button type="button" onClick={handleStart} variant="outline" className="rounded-full">
-                          <Play className="h-4 w-4" />
-                        </Button>
+              <Button type="button" onClick={handleStart} variant="outline" className="rounded-full">
+                <Play className="h-4 w-4" />
+              </Button>
             )}
           </div>
           <DropdownMenu>
