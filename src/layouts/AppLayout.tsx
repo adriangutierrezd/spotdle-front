@@ -51,29 +51,14 @@ export default function AppLayout() {
 
   const [open, setOpen] = useState(false)
   const [projectValue, setProjectValue] = useState("")
+  const [projects, setProjects] = useState<any[]>([])
 
-  const frameworks = [
-    {
-      value: "next.js",
-      label: "Next.js",
-    },
-    {
-      value: "sveltekit",
-      label: "SvelteKit",
-    },
-    {
-      value: "nuxt.js",
-      label: "Nuxt.js",
-    },
-    {
-      value: "remix",
-      label: "Remix",
-    },
-    {
-      value: "astro",
-      label: "Astro",
-    },
-  ]
+
+  useEffect(() => {
+    const projectsData = getProjects()
+    const { data } = projectsData
+    setProjects(data)
+  }, [])
 
   const dispatch = useDispatch();
   const { isRunning, value } = useSelector((state: TimerReducer) => {
@@ -211,33 +196,32 @@ export default function AppLayout() {
                   aria-expanded={open}
                   className="w-[200px] justify-between"
                 >
-                  {value
-                    ? frameworks.find((framework) => framework.value === projectValue)?.label
-                    : "Select framework..."}
+                  {projectValue
+                    ? projects.find((project) => Number(project.id) === Number(projectValue))?.name
+                    : "Selecciona un proyecto..."}
                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[200px] p-0">
                 <Command>
-                  <CommandInput placeholder="Search framework..." className="h-9" />
-                  <CommandEmpty>No framework found.</CommandEmpty>
+                  <CommandInput placeholder="Busca un proyecto..." className="h-9" />
+                  <CommandEmpty>Proyecto no encontrado</CommandEmpty>
                   <CommandGroup>
                     <NativeCommand.List>
-
-                      {frameworks.map((framework) => (
+                      {projects.map((project) => (
                         <CommandItem
-                          key={framework.value}
-                          value={framework.value}
+                          key={project.id}
+                          value={project.id.toString()}
                           onSelect={(currentValue) => {
                             setProjectValue(currentValue === projectValue ? "" : currentValue)
                             setOpen(false)
                           }}
                         >
-                          {framework.label}
+                          {project.name}
                           <CheckIcon
                             className={cn(
                               "ml-auto h-4 w-4",
-                              projectValue === framework.value ? "opacity-100" : "opacity-0"
+                              projectValue === project.id.toString() ? "opacity-100" : "opacity-0"
                             )}
                           />
                         </CommandItem>
