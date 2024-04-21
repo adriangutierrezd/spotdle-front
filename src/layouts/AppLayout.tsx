@@ -19,12 +19,21 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import HeaderTimerForm from "@/components/HeaderTimerForm"
 import DrawerTimerForm from "@/components/DrawerTimerForm"
+import { useDispatch } from 'react-redux'
+import { logout } from "@/slices/userSlice"
 
 
 export default function AppLayout() {
 
   const location = useLocation();
   const { pathname } = location;
+
+  const dispatch = useDispatch()
+
+  const handleLogout = () => {
+    dispatch(logout())
+    window.location.href = '/'
+  }
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -118,12 +127,7 @@ export default function AppLayout() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="hover:cursor-pointer">Cerrar sesión</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

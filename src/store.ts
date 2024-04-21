@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import timerReducer from './slices/timerSlice'
+import userReducer from './slices/userSlice'
 
 export const store = configureStore({
   reducer: {
-    timer: timerReducer
+    timer: timerReducer,
+    userSession: userReducer
   },
 })
 

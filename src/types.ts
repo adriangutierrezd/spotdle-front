@@ -27,3 +27,15 @@ export interface Project {
     seconds: number;
     project: Project
   }
+
+  export interface UserData {
+    id: number;
+    name: string;
+    email: string;
+  }
+
+
+  export interface UserSession {
+    token: string | null;
+    user: UserData | null;
+  }

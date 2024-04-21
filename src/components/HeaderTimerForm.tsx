@@ -93,7 +93,7 @@ export default function HeaderTimerForm(){
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-[200px] justify-between"
+              className="w-[250px] justify-between"
             >
               {projectValue
                 ? projects.find((project) => Number(project.id) === Number(projectValue))?.name
@@ -101,7 +101,7 @@ export default function HeaderTimerForm(){
               <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
+          <PopoverContent className="w-[250px] p-0">
             <Command>
               <CommandInput placeholder="Busca un proyecto..." className="h-9" />
               <CommandEmpty>Proyecto no encontrado</CommandEmpty>
