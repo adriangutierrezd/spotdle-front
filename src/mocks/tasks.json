@@ -6,7 +6,9 @@
             "id": 1,
             "projectId": 1,
             "active": true,
+            "date": "2024-04-20",
             "startedAt": "2024-04-20 13:00:00",
+            "seconds": 400,
             "endedAt": null,
             "project": {
                 "name": "Salud",
@@ -21,8 +23,10 @@
             "id": 2,
             "projectId": 1,
             "active": false,
-            "startedAt": "2024-04-20 10:00:00",
-            "endedAt": "2024-04-20 10:30:00",
+            "date": "2024-04-21",
+            "startedAt": "2024-04-21 10:00:00",
+            "endedAt": "2024-04-21 10:30:00",
+            "seconds": 200,
             "project": {
                 "name": "Salud",
                 "color": "#FFA533",

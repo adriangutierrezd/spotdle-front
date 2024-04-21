@@ -1,7 +1,6 @@
 import projects from '@/mocks/projects.json'
 
 export const getProjects = () => {
-
     const response = {
         status: 200,
         data: []
@@ -12,7 +11,6 @@ export const getProjects = () => {
             response.data.push(project)
         }
     })
-
 
     return response
 }

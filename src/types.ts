@@ -3,8 +3,27 @@ export interface TimerState {
     isRunning: boolean;
   }
   
-
   export interface TimerReducer {
     timer: TimerState
   }
   
+
+export interface Project {
+  name: string;
+  color: string;
+  userId: number;
+  id: number;
+}
+
+  export interface Task{
+    name: string;
+    userId: number;    
+    id: number;
+    projectId: number;
+    active: false,
+    date: string;
+    startedAt: string;
+    endedAt: string | null;
+    seconds: number;
+    project: Project
+  }

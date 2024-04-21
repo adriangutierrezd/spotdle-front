@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getTasks } from "@/services/tasksService"
 import { useEffect, useState } from "react"
+import TasksList from "./TasksList"
 
 export default function AppHome() {
 
@@ -24,9 +25,9 @@ export default function AppHome() {
       </TabsList>
       </div>
 
-      <TabsContent value="week">Make changes to your account here.</TabsContent>
-      <TabsContent value="month">Change your password here.</TabsContent>
-      <TabsContent value="year">Change your password here.</TabsContent>
+      <TabsContent value="week"><TasksList tasks={tasks} /></TabsContent>
+      <TabsContent value="month"><TasksList tasks={tasks} /></TabsContent>
+      <TabsContent value="year"><TasksList tasks={tasks} /></TabsContent>
     </Tabs>
 
   )
