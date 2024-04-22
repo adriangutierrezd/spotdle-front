@@ -1,16 +1,15 @@
-import projects from '@/mocks/projects.json'
+export const getProjects = async ({token}: { readonly token: string }) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append('Authorization', `Bearer ${token}`)
 
-export const getProjects = () => {
-    const response = {
-        status: 200,
-        data: []
-    }
+    const requestOptions: RequestInit = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
 
-    projects.projects.forEach((project: any) => {
-        if(project.userId === 1){
-            response.data.push(project)
-        }
-    })
-
-    return response
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/projects`, requestOptions)
+    const data = await response.json()
+    return data
 }

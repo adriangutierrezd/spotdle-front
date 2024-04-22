@@ -1,5 +1,5 @@
 import { formatSecondsToTime, cn } from "@/lib/utils"
-import { getProjects } from "@/services/projectsService"
+import {  getProjects } from "@/services/projectsService"
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import {
   Command,
@@ -32,19 +32,38 @@ export default function HeaderTimerForm(){
   
     const [projectValue, setProjectValue] = useState("")
     const [projects, setProjects] = useState<Project[]>([])
-  
-  
-    useEffect(() => {
-      const projectsData = getProjects()
-      const { data } = projectsData
-      setProjects(data)
-    }, [])
-  
+    const [isLoading, setIsLoading] = useState<boolean>(true)
     const dispatch = useDispatch();
     const { isRunning, value } = useSelector((state: TimerReducer) => {
       return state.timer
     });
+
+    const {token} = useSelector((state) => {
+      return state.userSession
+    });
   
+
+    const fetchData = async () => {
+      try{
+        setIsLoading(true)
+        const response = await getProjects({ token })
+        if(response.status !== 200){
+          // TODO
+        }
+  
+        setProjects(response.data)
+      }catch(error){
+        // TODO
+      }finally{
+        setIsLoading(false)
+      }
+    }
+  
+    useEffect(() => {
+      fetchData()
+    }, [])
+
+
     const handleStart = () => {
       // TODO
       /**
