@@ -13,3 +13,20 @@ export const getProjects = async ({token}: { readonly token: string }) => {
     const data = await response.json()
     return data
 }
+
+export const storeProject = async ({token, props}:  {readonly token: string, readonly props: object}) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append('Authorization', `Bearer ${token}`)
+
+    const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: myHeaders,
+        redirect: 'follow',
+        body: JSON.stringify(props)
+    };
+
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/projects`, requestOptions)
+    const data = await response.json()
+    return data
+}
