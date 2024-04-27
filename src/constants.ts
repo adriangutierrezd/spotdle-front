@@ -18,10 +18,12 @@ export const HTTP_OK = 200
 export const HTTP_CREATED = 201
 export const GENERAL_ERROR_MESSAGE = "Ha ocurrido un error inesperado"
 
-export const getHeaders = (token: string): Headers => {
+export const getHeaders = (token: string | null): Headers => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Authorization', `Bearer ${token}`)
+    if(token) {
+        myHeaders.append('Authorization', `Bearer ${token}`)
+    }
     myHeaders.append('Accept', 'application/json')
     return myHeaders
 }

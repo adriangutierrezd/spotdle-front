@@ -14,19 +14,6 @@ export interface Project {
   id: number;
 }
 
-  export interface Task{
-    name: string;
-    userId: number;    
-    id: number;
-    projectId: number;
-    active: false,
-    date: string;
-    startedAt: string;
-    endedAt: string | null;
-    seconds: number;
-    project: Project
-  }
-
   export interface UserData {
     id: number;
     name: string;
@@ -43,4 +30,17 @@ export interface Project {
   export interface RootState {
     userSession: UserSession,
     timer: TimerState
+  }
+
+  export interface Task {
+    id: number;
+    userId: number;
+    projectId: number | null;
+    project: Project | null;
+    description: string | null;
+    date: string;
+    running: boolean;
+    seconds: number;
+    startedAt: string;
+    endedAt: string | null;
   }

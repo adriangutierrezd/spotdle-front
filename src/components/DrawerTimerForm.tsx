@@ -1,9 +1,9 @@
 
 import { Input } from "@/components/ui/input"
 import { useSelector, useDispatch } from 'react-redux'
-import { start, increment, stop } from "@/slices/timerSlice"
+import { start, stop, update } from "@/slices/timerSlice"
 import { useEffect, useState } from "react"
-import { Project, TimerReducer } from "@/types"
+import { Project, RootState, TimerReducer } from "@/types"
 import { formatSecondsToTime, cn } from "@/lib/utils"
 import { getProjects } from "@/services/projectsService"
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
 import { Play, Square } from "lucide-react"
+import { HTTP_OK } from "@/constants"
 
 
 
@@ -44,15 +45,15 @@ export default function DrawerTimerForm(){
       return state.timer
     });
 
-    const {token} = useSelector((state) => {
+    const {token} = useSelector((state: RootState) => {
       return state.userSession
     });
   
     const fetchData = async () => {
       try{
         setIsLoading(true)
-        const response = await getProjects({ token })
-        if(response.status !== 200){
+        const response = await getProjects({ token: token ?? '' })
+        if(response.status !== HTTP_OK){
           // TODO
         }
   
@@ -91,7 +92,7 @@ export default function DrawerTimerForm(){
     useEffect(() => {
         if (isRunning) {
           const intervalId = setInterval(() => {
-            dispatch(increment());
+            dispatch(update())
           }, 1000);
     
           return () => clearInterval(intervalId);

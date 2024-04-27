@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useDispatch } from 'react-redux'
 import { login } from "@/slices/userSlice"
 import { UserSession } from "@/types"
+import { ERROR_TOAST_TITLE, GENERAL_ERROR_MESSAGE, HTTP_OK } from "@/constants"
 
 const FormSchema = z.object({
   email: z.string().email('Debes introducir un email válido'),
@@ -50,10 +51,10 @@ export default function SignInPage() {
         password: data.password
       })
       
-      if(response.status !== 200){
+      if(response.status !== HTTP_OK){
         toast({
-          title: "Error",
-          description: response.message,
+          title: ERROR_TOAST_TITLE,
+          description: response?.message ?? GENERAL_ERROR_MESSAGE,
           variant: "destructive"
         })
         return
@@ -73,8 +74,8 @@ export default function SignInPage() {
 
     }catch(error){
       toast({
-        title: "Error",
-        description: "Ha ocurrido un error inesperado",
+        title: ERROR_TOAST_TITLE,
+        description: error instanceof Error ? error.message : GENERAL_ERROR_MESSAGE,
         variant: "destructive"
       })
     }

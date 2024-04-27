@@ -1,3 +1,5 @@
+import { getHeaders } from "@/constants";
+
 interface Props {
     name: string,
     email: string,
@@ -5,8 +7,7 @@ interface Props {
 }
 
 export const signUpService = async({ email, name, password }:Props) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+    const myHeaders = getHeaders(null)
 
     const raw = JSON.stringify({ email, name, password });
 
@@ -20,7 +21,5 @@ export const signUpService = async({ email, name, password }:Props) => {
 
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/sign-up`, requestOptions)
     const data = await response.json()
-
-    data.status = response.status
     return data
 }
