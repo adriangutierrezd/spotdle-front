@@ -1,7 +1,7 @@
+import { getHeaders } from "@/constants";
+
 export const getProjects = async ({token}: { readonly token: string }) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Authorization', `Bearer ${token}`)
+    const myHeaders = getHeaders(token)
 
     const requestOptions: RequestInit = {
         method: 'GET',
@@ -15,9 +15,7 @@ export const getProjects = async ({token}: { readonly token: string }) => {
 }
 
 export const storeProject = async ({token, props}:  {readonly token: string, readonly props: object}) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Authorization', `Bearer ${token}`)
+    const myHeaders = getHeaders(token)
 
     const requestOptions: RequestInit = {
         method: 'POST',
@@ -32,9 +30,7 @@ export const storeProject = async ({token, props}:  {readonly token: string, rea
 }
 
 export const deleteProject = async ({token, projectId}: {readonly token: string, readonly projectId: number}) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Authorization', `Bearer ${token}`)
+    const myHeaders = getHeaders(token)
 
     const requestOptions: RequestInit = {
         method: 'DELETE',
@@ -48,9 +44,7 @@ export const deleteProject = async ({token, projectId}: {readonly token: string,
 }
 
 export const updateProject = async ({token, projectId, name, color}:  {readonly token: string, readonly projectId: number, readonly name: string, readonly color: string}) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append('Authorization', `Bearer ${token}`)
+    const myHeaders = getHeaders(token)
 
     const requestOptions: RequestInit = {
         method: 'PUT',

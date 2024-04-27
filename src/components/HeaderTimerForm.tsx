@@ -135,7 +135,10 @@ export default function HeaderTimerForm(){
                         setOpen(false)
                       }}
                     >
-                      {project.name}
+                      <span className="flex items-center space-x-4">
+                        <div className="h-3 w-3 rounded-full mr-2" style={{backgroundColor: project.color}}></div>
+                        {project.name}
+                      </span>
                       <CheckIcon
                         className={cn(
                           "ml-auto h-4 w-4",

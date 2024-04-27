@@ -12,8 +12,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -21,6 +19,7 @@ import HeaderTimerForm from "@/components/HeaderTimerForm"
 import DrawerTimerForm from "@/components/DrawerTimerForm"
 import { useDispatch } from 'react-redux'
 import { logout } from "@/slices/userSlice"
+import { useState } from "react"
 
 
 export default function AppLayout() {
@@ -29,6 +28,7 @@ export default function AppLayout() {
   const { pathname } = location;
 
   const dispatch = useDispatch()
+  const [sheetOpen, setSheetOpen] = useState<boolean>(false)
 
   const handleLogout = () => {
     dispatch(logout())
@@ -74,7 +74,9 @@ export default function AppLayout() {
       </div>
       <div className="flex flex-col">
         <header className="flex h-14 justify-between items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          <Sheet>
+          <Sheet open={sheetOpen} onOpenChange={() => {
+            setSheetOpen(!sheetOpen)
+          }}>
             <SheetTrigger asChild>
               <Button
                 variant="outline"
@@ -88,13 +90,19 @@ export default function AppLayout() {
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
                 <NavLink
+                  onClick={() => {
+                    setSheetOpen(false)
+                  }}
                   to="/app"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 text-lg font-semibold mb-3"
                 >
                   <Hourglass className="h-6 w-6" />
                   <span className="sr-only">Time tracker</span>
                 </NavLink>
                 <NavLink
+                  onClick={() => {
+                    setSheetOpen(false)
+                  }}
                   to="/app"
                   className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/app' ? 'bg-muted text-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground'} `}
                 >
@@ -102,6 +110,9 @@ export default function AppLayout() {
                   Panel de control
                 </NavLink>
                 <NavLink
+                  onClick={() => {
+                    setSheetOpen(false)
+                  }}
                   to="/app/projects"
                   className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/app/projects' ? 'bg-muted text-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground'} `}
                 >
@@ -109,6 +120,9 @@ export default function AppLayout() {
                   Proyectos
                 </NavLink>
                 <NavLink
+                  onClick={() => {
+                    setSheetOpen(false)
+                  }}
                   to="/app/stats"
                   className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${pathname === '/app/stats' ? 'bg-muted text-foreground hover:text-foreground' : 'text-muted-foreground hover:text-foreground'} `}
                 >
