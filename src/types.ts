@@ -6,7 +6,6 @@ export interface TimerState {
   export interface TimerReducer {
     timer: TimerState
   }
-  
 
 export interface Project {
   name: string;
@@ -38,4 +37,10 @@ export interface Project {
   export interface UserSession {
     token: string | null;
     user: UserData | null;
+  }
+
+
+  export interface RootState {
+    userSession: UserSession,
+    timer: TimerState
   }
