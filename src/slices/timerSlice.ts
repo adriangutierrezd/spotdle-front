@@ -47,6 +47,7 @@ export const timerSlice = createSlice({
       if(timer){
         const data = JSON.parse(timer)
         startDate = data.startMoment
+        state.isRunning = true
       }
       const timerInit = moment(startDate)
       const actualMoment = moment();

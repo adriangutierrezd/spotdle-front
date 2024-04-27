@@ -30,7 +30,7 @@ export const updateTask = async ({token, taskId, props}:  {readonly token: strin
     return data
 }
 
-export const getTasks = async ({token}:  {readonly token: string}) => {
+export const getTasks = async ({token, running}:  {readonly token: string, readonly running: number | null}) => {
     const myHeaders = getHeaders(token)
 
     const requestOptions: RequestInit = {
@@ -39,7 +39,9 @@ export const getTasks = async ({token}:  {readonly token: string}) => {
         redirect: 'follow',
     };
 
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/tasks`, requestOptions)
+    const queryParams = running === null ? '' : `?running[eq]=${running}`
+
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/tasks${queryParams}`, requestOptions)
     const data = await response.json()
     return data
 }

@@ -24,9 +24,11 @@ import { Input } from "@/components/ui/input"
 import { useSelector, useDispatch } from 'react-redux'
 import { start, stop, update } from "@/slices/timerSlice"
 import { useEffect, useState } from "react"
-import { Project, RootState, TimerReducer } from "@/types"
-import { HTTP_OK } from "@/constants"
-import { storeTask } from "@/services/tasksService"
+import { Project, RootState, Task, TimerReducer } from "@/types"
+import { CORRECT_TOAST_TITLE, ERROR_TOAST_TITLE, GENERAL_ERROR_MESSAGE, HTTP_OK } from "@/constants"
+import { getTasks, storeTask, updateTask } from "@/services/tasksService"
+import { toast } from "./ui/use-toast"
+import moment from "moment"
 
 export default function HeaderTimerForm() {
 
@@ -37,6 +39,7 @@ export default function HeaderTimerForm() {
   const [taskDescription, setTaskDescription] = useState<string>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const dispatch = useDispatch();
+  const [onGoinTask, setOnGoinTask] = useState<Task>()
   const { isRunning, value } = useSelector((state: TimerReducer) => {
     return state.timer
   });
@@ -48,15 +51,47 @@ export default function HeaderTimerForm() {
 
   const fetchData = async () => {
     try {
+
       setIsLoading(true)
+      const taskResponse = await getTasks({
+        token: token ?? '',
+        running: 1
+      })
       const response = await getProjects({ token: token ?? '' })
       if (response.status !== HTTP_OK) {
-        // TODO
+        toast({
+          title: CORRECT_TOAST_TITLE,
+          description: response?.message ?? GENERAL_ERROR_MESSAGE
+        })
+      }
+
+      if(taskResponse.status !== HTTP_OK){
+        toast({
+          title: CORRECT_TOAST_TITLE,
+          description: taskResponse?.message ?? GENERAL_ERROR_MESSAGE
+        })
+      }
+
+      if(taskResponse.data.length > 0){
+        const defaultOnGoinTask = taskResponse.data[taskResponse.data.length - 1]
+        if(!window.localStorage.getItem('timer')){
+          window.localStorage.setItem('timer', JSON.stringify({startMoment: moment(defaultOnGoinTask.startedAt, 'YYYY-MM-DD HH:mm:ss').toDate()}))
+        }
+        dispatch(update())
+        setOnGoinTask(defaultOnGoinTask)
+        setProjectValue(defaultOnGoinTask.projectId)
+        setTaskDescription(defaultOnGoinTask.description)
+      }else{
+        dispatch(stop())
       }
 
       setProjects(response.data)
     } catch (error) {
-      // TODO
+      toast({
+        title: ERROR_TOAST_TITLE,
+        description: error instanceof Error ? error.message : GENERAL_ERROR_MESSAGE,
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
@@ -68,17 +103,7 @@ export default function HeaderTimerForm() {
 
 
   const handleStart = async () => {
-    dispatch(start());
     try {
-
-      const timerStg = window.localStorage.getItem('timer')
-      if (!timerStg) {
-        // TODO
-        return
-      }
-
-      const timerData = JSON.parse(timerStg)
-
       const response = await storeTask({
         token: token ?? '',
         props: {
@@ -86,22 +111,34 @@ export default function HeaderTimerForm() {
           projectId: projectValue.length > 0 ? projectValue : null,
           running: true,
           seconds: 0,
-          started_at: timerData.startMoment
+          started_at: new Date()
         }
       })
+      dispatch(start());
+      setOnGoinTask(response.data)
 
-      console.log({ response })
     } catch (error) {
       console.log({ error })
     }
   };
 
-  const handleStop = () => {
-    // TODO
-    /**
-     *  Debemos mandar una llamada al backend para 2 actualizar la tarea y dejar constancia del momento de finalización
-     */
-    dispatch(stop());
+  const handleStop = async () => {
+    try{
+      dispatch(stop());
+      if(onGoinTask){
+        await updateTask({
+          token: token ?? '',
+          taskId: onGoinTask.id,
+          props: {
+            running: false,
+            endedAt: new Date(),
+            seconds: value
+          }
+        })
+      }
+    }catch(error){
+      console.log({error})
+    }
   };
 
   useEffect(() => {
@@ -114,7 +151,19 @@ export default function HeaderTimerForm() {
     }
   }, [isRunning, dispatch]);
 
-
+  useEffect(() => {
+    if(onGoinTask){
+      console.log({projectValue})
+      updateTask({
+        token: token ?? '',
+        taskId: onGoinTask.id,
+        props: {
+          projectId: isNaN(Number(projectValue)) ? null : Number(projectValue),
+          description: taskDescription
+        }
+      })
+    }
+  }, [projectValue, taskDescription])
 
   return (
     <div className="hidden md:flex w-full flex-1 flex space-x-2 items-center">
