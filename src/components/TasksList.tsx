@@ -20,11 +20,29 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Input } from "./ui/input"
+import ProjectSelector from "./ProjectSelector"
 
 interface Props {
     readonly tasks: Task[]
     readonly handleDeleTask: (taskId: number) => void;
 }
+
+const EditTaskSchema = z.object({
+    description: z.string().optional(),
+    projectId: z.string().optional()
+})
 
 
 export default function TasksList({ tasks, handleDeleTask }: Props) {
@@ -49,6 +67,15 @@ const SingleTask = ({ className, task, handleDeleTask }: SingleTaskProps) => {
 
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false)
+
+
+    const form = useForm<z.infer<typeof EditTaskSchema>>({
+        resolver: zodResolver(EditTaskSchema),
+        defaultValues: {
+            description: task.description ?? undefined,
+            projectId: task.projectId ? task.projectId.toString() : undefined
+        },
+    })
 
     return (
         <>
@@ -113,9 +140,29 @@ const SingleTask = ({ className, task, handleDeleTask }: SingleTaskProps) => {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Editar tarea</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <Form {...form}>
+                            <form>
+                                <div className="grid gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tarea</FormLabel>
+                                                <FormControl>
+                                                    <Input type="text" placeholder="¿Qué estás haciendo?" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <ProjectSelector width={300} defaultOption={task.projectId ? task.projectId.toString() : ''} onProjectSelected={(value) => {
+                                        console.log(value)
+                                    }} />
 
-                        </AlertDialogDescription>
+                                </div>
+                            </form>
+                        </Form>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>

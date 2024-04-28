@@ -9,11 +9,6 @@ import { TableSkeleton } from "./Skeletons";
 import { Button } from "./ui/button";
 import { EllipsisVertical, Plus } from "lucide-react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,41 +23,26 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Input } from "./ui/input";
-import { AVAILABLE_COLORS, CORRECT_TOAST_TITLE, ERROR_TOAST_TITLE, GENERAL_ERROR_MESSAGE, HTTP_CREATED, HTTP_OK } from "@/constants";
-import { Label } from "./ui/label";
+import { CORRECT_TOAST_TITLE, ERROR_TOAST_TITLE, GENERAL_ERROR_MESSAGE, HTTP_CREATED, HTTP_OK } from "@/constants";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import ProjectDialog from "./ProjectDialog";
 
-
-const projectNameHasValidLength = (projectName: string) => {
-  return projectName.trim().length > 2 && projectName.length < 100
-}
 
 export default function ProjectsPage() {
 
   const { toast } = useToast()
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [selectedColor, setSelectedColor] = useState<string>(AVAILABLE_COLORS[0])
-  const [projectName, setProjectName] = useState<string>('')
-  const [errorMessage, setErrorMessage] = useState<string>('')
-  const [openDialog, setOpenDialog] = useState<boolean>(false)
-
   const { token } = useSelector((state: RootState) => {
     return state.userSession
   });
 
-  const resetForm = () => {
-    setProjectName('')
-    setSelectedColor(AVAILABLE_COLORS[0])
-  }
 
   const fetchData = async () => {
     try {
@@ -144,22 +124,13 @@ export default function ProjectsPage() {
 
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-
-    event.preventDefault()
-    setErrorMessage('')
-
-    if (!projectNameHasValidLength(projectName)) {
-      setErrorMessage('El nombre debe tener entre 2 y 100 caracteres')
-      return
-    }
-
+  const handleCreateProject = async ({ name, color }: { name: string, color: string }) => {
     try {
       const response = await storeProject({
         token: token ?? '',
         props: {
-          name: projectName,
-          color: selectedColor
+          name,
+          color,
         }
       })
 
@@ -173,8 +144,6 @@ export default function ProjectsPage() {
         title: CORRECT_TOAST_TITLE,
         description: response.message
       })
-      setOpenDialog(false)
-      resetForm()
     } catch (error) {
       toast({
         title: ERROR_TOAST_TITLE,
@@ -182,7 +151,6 @@ export default function ProjectsPage() {
         variant: 'destructive'
       })
     }
-
   }
 
   useEffect(() => {
@@ -224,58 +192,18 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <h1 className="font-semibold text-xl">Tus proyectos</h1>
 
-        <AlertDialog open={openDialog} onOpenChange={() => {
-          setOpenDialog(!openDialog)
-        }}>
-          <AlertDialogTrigger asChild>
+        <ProjectDialog
+          title="Añadir proyecto"
+          trigger={
             <Button variant="outline">
               <Plus className="h-4 w-4 mr-2" />
               Añadir proyecto
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Crea un nuevo proyecto</AlertDialogTitle>
-            </AlertDialogHeader>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="flex items-center justify-between space-x-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="h-6 w-6 cursor-pointer rounded-full mt-5" style={{
-                      backgroundColor: selectedColor
-                    }}></button></PopoverTrigger>
-                  <PopoverContent asChild>
-                    <div className="w-[200px] grid grid-cols-4 gap-4 p-4">
-                      {AVAILABLE_COLORS.map((color: string) => {
-                        return (
-                          <button key={color} onClick={() => {
-                            setSelectedColor(color)
-                          }} className={`h-6 w-6 cursor-pointer rounded-full ${color === selectedColor ? 'border border-1 border-black' : ''}`} style={{
-                            backgroundColor: color
-                          }}>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <div className="flex-1">
-                  <Label>Nombre</Label>
-                  <Input value={projectName} onChange={(e) => {
-                    setProjectName(e.target.value)
-                  }} type="text" />
-                </div>
-              </div>
-              {errorMessage.length > 0 && (
-                <span className="text-red-500">{errorMessage}</span>
-              )}
-              <AlertDialogFooter >
-                <AlertDialogCancel onClick={resetForm} type="button">Cancelar</AlertDialogCancel>
-                <Button type="submit">Guardar</Button>
-              </AlertDialogFooter>
-            </form>
-          </AlertDialogContent>
-        </AlertDialog>
+            </Button>} onSubmit={(values) => {
+              handleCreateProject({
+                name: values.name,
+                color: values.color
+              })
+            }} />
       </div>
       {isLoading ? (<TableSkeleton columns={['Nombre', 'Color', 'Acciones']} />) : (<DataTable columns={columns} data={projects} />)}
     </>
@@ -292,27 +220,6 @@ interface ProjectTableActionsProps {
 const ProjectTableActions = ({ row, handleDeleteProject, handleUpdateProject }: ProjectTableActionsProps) => {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
-  const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
-  const [selectedColor, setSelectedColor] = useState<string>(row.original.color)
-  const [projectName, setProjectName] = useState<string>(row.original.name)
-  const [errorMessage, setErrorMessage] = useState<string>('')
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setErrorMessage('')
-
-    if (!projectNameHasValidLength(projectName)) {
-      setErrorMessage('El nombre debe tener entre 2 y 100 caracteres')
-      return
-    }
-
-    handleUpdateProject({
-      projectId: row.original.id,
-      name: projectName,
-      color: selectedColor
-    })
-  }
-
 
   return (
     <>
@@ -328,55 +235,22 @@ const ProjectTableActions = ({ row, handleDeleteProject, handleUpdateProject }: 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { setEditModalOpen(true) }}>Editar</DropdownMenuItem>
+          <ProjectDialog
+            title="Editar proyecto"
+            defaultColor={row.original.color}
+            defaultName={row.original.name}
+            trigger={
+              <Button variant="ghost" className="font-normal justify-start px-2 w-full hover:cursor-pointer">Editar</Button>
+            } onSubmit={(values) => {
+              handleUpdateProject({
+                projectId: row.original.id,
+                name: values.name,
+                color: values.color
+              })
+            }} />
           <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { setDeleteModalOpen(true) }}>Eliminar</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <AlertDialog open={editModalOpen} onOpenChange={() => setEditModalOpen(!editModalOpen)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Editar proyecto</AlertDialogTitle>
-          </AlertDialogHeader>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="flex items-center justify-between space-x-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button className="h-6 w-6 cursor-pointer rounded-full mt-5" style={{
-                    backgroundColor: selectedColor
-                  }}></button></PopoverTrigger>
-                <PopoverContent asChild>
-                  <div className="w-[200px] grid grid-cols-4 gap-4 p-4">
-                    {AVAILABLE_COLORS.map((color: string) => {
-                      return (
-                        <button key={color} onClick={() => {
-                          setSelectedColor(color)
-                        }} className={`h-6 w-6 cursor-pointer rounded-full ${color === selectedColor ? 'border border-1 border-black' : ''}`} style={{
-                          backgroundColor: color
-                        }}>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <div className="flex-1">
-                <Label>Nombre</Label>
-                <Input value={projectName} onChange={(e) => {
-                  setProjectName(e.target.value)
-                }} type="text" />
-              </div>
-            </div>
-            {errorMessage.length > 0 && (
-              <span className="text-red-500">{errorMessage}</span>
-            )}
-            <AlertDialogFooter >
-              <AlertDialogCancel type="button">Cancelar</AlertDialogCancel>
-              <Button type="submit">Guardar</Button>
-            </AlertDialogFooter>
-          </form>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <AlertDialog open={deleteModalOpen} onOpenChange={() => setDeleteModalOpen(!deleteModalOpen)}>
         <AlertDialogContent>

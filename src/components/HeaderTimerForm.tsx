@@ -29,10 +29,9 @@ import { CORRECT_TOAST_TITLE, ERROR_TOAST_TITLE, GENERAL_ERROR_MESSAGE, HTTP_OK 
 import { getTasks, storeTask, updateTask } from "@/services/tasksService"
 import { toast } from "./ui/use-toast"
 import moment from "moment"
+import ProjectSelector from "./ProjectSelector"
 
 export default function HeaderTimerForm() {
-
-  const [open, setOpen] = useState(false)
 
   const [projectValue, setProjectValue] = useState("")
   const [projects, setProjects] = useState<Project[]>([])
@@ -181,53 +180,7 @@ export default function HeaderTimerForm() {
           />
         </div>
       </form>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[250px] justify-between"
-          >
-            {projectValue
-              ? projects.find((project) => Number(project.id) === Number(projectValue))?.name
-              : "Selecciona un proyecto..."}
-            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[250px] p-0">
-          <Command>
-            <CommandInput placeholder="Busca un proyecto..." className="h-9" />
-            <CommandEmpty>Proyecto no encontrado</CommandEmpty>
-            <CommandGroup>
-              <NativeCommand.List>
-                {projects.map((project) => (
-                  <CommandItem
-                    key={project.id}
-                    value={project.id.toString()}
-                    onSelect={(currentValue) => {
-                      setProjectValue(currentValue === projectValue ? "" : currentValue)
-                      setOpen(false)
-                    }}
-                  >
-                    <span className="flex items-center space-x-4">
-                      <div className="h-3 w-3 rounded-full mr-2" style={{ backgroundColor: project.color }}></div>
-                      {project.name}
-                    </span>
-                    <CheckIcon
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        projectValue === project.id.toString() ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </NativeCommand.List>
-
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <ProjectSelector onProjectSelected={(value) => { setProjectValue(value) }} />
       <p>{formatSecondsToTime(value)}</p>
       {isRunning ? (<Button type="button" onClick={handleStop} variant="outline" className="rounded-full">
         <Square className="h-4 w-4" />
